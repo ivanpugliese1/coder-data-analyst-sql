@@ -8,6 +8,7 @@ DROP TABLE IF EXISTS productos;
 DROP TABLE IF EXISTS clientes;
 DROP TABLE IF EXISTS categorias;
 
+
 --- Sección 2 : Creo las tablas
 
 -- Tabla de categorías
@@ -86,5 +87,4 @@ INSERT INTO ventas (id_venta, id_cliente, id_producto, cantidad, precio_unitario
   ( 9, 4, 4, 1,  120.00, '2024-03-14'),
   (10, 5, 3, 2,  450.00, '2024-03-15');
 
-  SELECT * FROM ventas;
 
