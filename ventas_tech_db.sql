@@ -2,7 +2,7 @@
 -- Motor utilizado: SQL Server.
 
 /* Sección 1 : DROP TABLES
-Arranco el script eliminando las tablas si ya existen para que el script sea repetible y lo pueda correr las veces que queira sin errores. */
+Arranco el script eliminando las tablas si ya existen para que el script sea repetible y lo pueda correr las veces que quiera sin errores. */
 DROP TABLE IF EXISTS ventas;
 DROP TABLE IF EXISTS productos;
 DROP TABLE IF EXISTS clientes;
