@@ -1,22 +1,24 @@
 
 -- Motor utilizado: SQL Server.
 
-/* Sección 1 : DROP TABLES
-Arranco el script eliminando las tablas si ya existen para que el script sea repetible y lo pueda correr las veces que quiera sin errores. */
+-- ==================================================
+-- SECCIÓN 1 - ELIMINACIÓN DE TABLAS
+-- ==================================================
 DROP TABLE IF EXISTS ventas;
 DROP TABLE IF EXISTS productos;
 DROP TABLE IF EXISTS clientes;
 DROP TABLE IF EXISTS categorias;
+GO
 
-
---- Sección 2 : Creo las tablas
-
+-- ==================================================
+-- SECCIÓN 2 - CREACIÓN DE TABLAS
+-- ==================================================
 -- Tabla de categorías
 CREATE TABLE categorias (
     id_categoria INT PRIMARY KEY,
     nombre_categoria VARCHAR(50) NOT NULL,
-    descripcion VARCHAR(50)
-)
+    descripcion VARCHAR(200)
+);
 
 -- Tabla de clientes
 CREATE TABLE clientes (
@@ -25,7 +27,7 @@ CREATE TABLE clientes (
     email VARCHAR(100) UNIQUE,
     ciudad VARCHAR(50),
     fecha_registro DATE NOT NULL    
-)
+);
 
 -- Tabla de productos
 CREATE TABLE productos (
@@ -35,7 +37,7 @@ CREATE TABLE productos (
     precio DECIMAL(10,2) NOT NULL,
     stock INT DEFAULT 0,
     activo BIT DEFAULT 1
-)
+);
 
 -- Tabla de ventas
 CREATE TABLE ventas (
@@ -45,11 +47,12 @@ CREATE TABLE ventas (
     cantidad INT NOT NULL,
     precio_unitario DECIMAL(10,2) NOT NULL,
     fecha_venta DATE NOT NULL
-)
+);
 
 
---- Sección 3 : INSERT DATA
-
+-- ==================================================
+-- SECCIÓN 3 - INSERCCIÓN DE DATOS
+-- ==================================================
 -- Cargo 4 registros en la tabla de categorias
 INSERT INTO categorias (id_categoria, nombre_categoria, descripcion) VALUES
   (1, 'Computación',    'Laptops, PCs y monitores'),
@@ -88,3 +91,10 @@ INSERT INTO ventas (id_venta, id_cliente, id_producto, cantidad, precio_unitario
   (10, 5, 3, 2,  450.00, '2024-03-15');
 
 
+-- ==================================================
+-- SECCIÓN 4 - VALIDACIÓN DE DATOS
+-- ==================================================
+SELECT * FROM categorias;   
+SELECT * FROM clientes;     
+SELECT * FROM productos;    
+SELECT * FROM ventas;
