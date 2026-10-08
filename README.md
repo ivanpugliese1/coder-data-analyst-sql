@@ -4,12 +4,6 @@ Repositorio de ejercicios del curso de SQL de Coderhouse, realizados como parte 
 
 El proyecto utiliza una base de datos de ejemplo de ventas de productos tecnológicos. La actividad de M3 implementa las tablas y carga los datos; la pre-entrega de M4 utiliza esa información para responder preguntas de negocio del equipo comercial de RetailPro.
 
-## Tecnologías y requisitos
-
-- Microsoft SQL Server 2016 o posterior.
-- SQL Server Management Studio (SSMS).
-- Transact-SQL (T-SQL).
-- Una base de datos llamada `ventas_tech_db`.
 
 ## Contenido del repositorio
 
