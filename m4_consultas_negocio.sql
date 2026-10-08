@@ -3,13 +3,13 @@
 -- CONSULTA 1 - RESUMEN EJECUTIVO MENSUAL
 -- ==================================================
 SELECT 
-	MONTH(fecha_venta) AS mes, --> Extrae el número de mes de cada fecha.
-	SUM(cantidad * precio_unitario) AS total_facturado, --> En este caso especifico, dentro de cada grupo se suman los importes de cada pedido.
-	COUNT(*) AS cantidad_pedidos, --> Cuenta las filas.
-	CAST(AVG(cantidad * precio_unitario) AS DECIMAL(18,2)) AS ticket_promedio --> Calculamos el promedio de los importes de los pedidos y los CASTEAMOS a 2 decimales
-FROM ventas -- ¿De donde salen los datos? --> de la tabla de ventas.
-GROUP BY MONTH(fecha_venta) --> Agrupa las ventas que tengan el mismo número de mes, por ejemplo, junta todos los pedidos de marzo y calcula sus metricas en conjunto. UN RESUTADO POR GRUPO Y NO CADA FILA INDIVIDUAL.
-ORDER BY mes; --> Ordena de menor a mayor, por mes en este caso.
+	MONTH(fecha_venta) AS mes, 
+	SUM(cantidad * precio_unitario) AS total_facturado, 
+	COUNT(*) AS cantidad_pedidos, 
+	CAST(AVG(cantidad * precio_unitario) AS DECIMAL(18,2)) AS ticket_promedio -
+FROM ventas 
+GROUP BY MONTH(fecha_venta) 
+ORDER BY mes; 
 
 -- ==================================================
 -- CONSULTA 2 - RANKING DE PRODUCTOS
@@ -19,19 +19,19 @@ SELECT TOP 5
 	SUM(cantidad) AS unidades_vendidas,
 	SUM(cantidad * precio_unitario) AS total_facturado
 FROM ventas
-GROUP BY id_producto --> Reune las ventas de cada producto, por ejemplo: el producto 1 aparece en dos ventas (la 1 y la 7), luego de agrupar suma las unidades y el total facturado de ambas ventas.
-ORDER BY total_facturado DESC, id_producto ASC; --> El DESC ordena desde el que mas facturo hasta el que menos facturo, con el ASC en el id_producto resuelve la cuestion de que dos productos facturen lo mismo, aparecera el de menor ID.
+GROUP BY id_producto 
+ORDER BY total_facturado DESC, id_producto ASC; 
 
 -- ==================================================
 -- CONSULTA 3 - CLIENTES RECURRENTES
 -- ==================================================
 SELECT 
 	id_cliente,
-	COUNT(*) AS cantidad_pedidos, --> Cuento cuantos pedidos pertenecen a cada cliente.
+	COUNT(*) AS cantidad_pedidos, 
 	SUM(cantidad * precio_unitario) AS total_gastado
 FROM VENTAS
-GROUP BY id_cliente --> Agrupo todos los pedidos de cada cliente.
-HAVING COUNT(*) > 1 --> De todos los grupos que formaste, conserva unicamente los que tengan mas de un pedido. Se usa siempre despues de agrupar. 
+GROUP BY id_cliente 
+HAVING COUNT(*) > 1 
 ORDER BY total_gastado DESC, id_cliente ASC;
 
 -- ==================================================
@@ -43,7 +43,7 @@ WITH facturacion_mensual AS (
 		SUM(cantidad * precio_unitario) AS total_facturado
 	FROM ventas
 	GROUP BY MONTH(fecha_venta)
-) --> En este bloque construimos el resumen mensual para poder consultarlo en la siguiente instruccion.
+) 
 
 SELECT
 	mes,
@@ -51,13 +51,13 @@ SELECT
 	CASE
 		WHEN total_facturado > (
 			SELECT
-				AVG(total_facturado) --> Aca devolvemos el promedio de los totales mensuales de "facturacion_mensual"
+				AVG(total_facturado) 
 			FROM facturacion_mensual
 		) THEN N'Por encima'
 
 		WHEN total_facturado < (
 			SELECT 
-				AVG(total_facturado) --> Aca devolvemos el promedio de los totales mensuales de "facturacion_mensual"
+				AVG(total_facturado) 
 			FROM facturacion_mensual
 		) THEN N'Por debajo'
 
