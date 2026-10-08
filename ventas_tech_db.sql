@@ -1,18 +1,18 @@
 
 -- Motor utilizado: SQL Server.
 
--- ==================================================
+-- =================================================
 -- SECCIÓN 1 - ELIMINACIÓN DE TABLAS
--- ==================================================
+-- =================================================
 DROP TABLE IF EXISTS ventas;
 DROP TABLE IF EXISTS productos;
 DROP TABLE IF EXISTS clientes;
 DROP TABLE IF EXISTS categorias;
 GO
 
--- ==================================================
+-- =================================================
 -- SECCIÓN 2 - CREACIÓN DE TABLAS
--- ==================================================
+-- =================================================
 -- Tabla de categorías
 CREATE TABLE categorias (
     id_categoria INT PRIMARY KEY,
@@ -50,9 +50,9 @@ CREATE TABLE ventas (
 );
 
 
--- ==================================================
+-- =================================================
 -- SECCIÓN 3 - INSERCCIÓN DE DATOS
--- ==================================================
+-- =================================================
 -- Cargo 4 registros en la tabla de categorias
 INSERT INTO categorias (id_categoria, nombre_categoria, descripcion) VALUES
   (1, 'Computación',    'Laptops, PCs y monitores'),
@@ -91,9 +91,9 @@ INSERT INTO ventas (id_venta, id_cliente, id_producto, cantidad, precio_unitario
   (10, 5, 3, 2,  450.00, '2024-03-15');
 
 
--- ==================================================
+-- =================================================
 -- SECCIÓN 4 - VALIDACIÓN DE DATOS
--- ==================================================
+-- =================================================
 SELECT * FROM categorias;   
 SELECT * FROM clientes;     
 SELECT * FROM productos;    
