@@ -73,6 +73,45 @@ El agrupamiento usa `MONTH(fecha_venta)`, tal como solicita la consigna. Si se i
 
 La moneda no está especificada en la base de ejemplo. Los importes se presentan sin símbolo monetario.
 
+## M5 — Consultas con JOINs
+
+### Objetivo
+
+Cruzar las tablas del esquema de M3 para obtener la vista enriquecida que necesita Power BI (ventas con cliente, producto, categoría y ciudad en una sola consulta) y responder dos preguntas puntuales: qué clientes nunca compraron (área de CRM) y qué productos del catálogo no tienen movimiento (área de Producto).
+
+### Consultas incluidas
+
+| Consulta                  | Pregunta de negocio                                                                          | Elementos utilizados                                  |
+| ------------------------- | -------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| 1. Vista base             | ¿Cómo se ve cada venta con cliente, ciudad, producto, categoría y total en una sola fila?    | `INNER JOIN` encadenado (4 tablas), alias, `ORDER BY`. |
+| 2. Clientes sin ventas    | ¿Qué clientes registrados nunca compraron? (CRM)                                             | `LEFT JOIN`, `WHERE ... IS NULL`.                     |
+| 3. Productos sin ventas   | ¿Qué productos del catálogo no tienen ninguna venta? (Producto)                              | `LEFT JOIN` (2 tablas), `WHERE ... IS NULL`.          |
+| 4. Consolidado por canal  | ¿Cuánto se facturó en cada período de marzo?                                                 | `UNION ALL`, valor literal, subconsulta, `GROUP BY`.  |
+
+Cada consulta está precedida por un comentario con su propósito y seguida por un comentario `-- Hallazgo:` que interpreta el resultado en términos de negocio.
+
+### Datos de prueba
+
+La base de M3 no tiene clientes sin compras ni productos sin ventas, por lo que las consultas 2 y 3 devolverían 0 filas. Por eso el script de M5 incluye, al principio, un bloque que agrega un cliente (`Sofía Díaz`, id 6) y un producto (`Webcam Full HD`, id 7) sin ventas. El bloque usa `IF NOT EXISTS`, así que puede ejecutarse varias veces sin generar claves duplicadas.
+
+Con estos registros, las tablas pasan a tener **6 clientes** y **7 productos**. Las consultas de M4 no se ven afectadas, porque trabajan únicamente sobre `ventas`.
+
+### Resultados esperados
+
+- **Consulta 1:** 10 filas, una por venta. La facturación total suma **6.444,00**. Computación concentra **4.950,00** (76,8 %) y Buenos Aires es la ciudad con mayor facturación, con **2.640,00** (41 %).
+- **Consulta 2:** 1 cliente sin compras (Sofía Díaz, registrada el 20/03/2024).
+- **Consulta 3:** 1 producto sin ventas (Webcam Full HD, categoría Accesorios, precio 75,00).
+- **Consulta 4:** 2 filas. El Periodo A (05–10 de marzo) factura **3.620,00** y el Periodo B (11–15 de marzo) **2.824,00**.
+
+### Decisiones de diseño
+
+- **Cadena de JOINs:** `categorias` no se relaciona directamente con `ventas`; se llega a ella a través de `productos` (`ventas → productos → categorias`).
+- **Precio de la venta:** el total usa `ventas.precio_unitario` (precio al momento de vender) y no `productos.precio` (precio actual del catálogo).
+- **`IS NULL` sobre la clave primaria:** en las consultas 2 y 3 se evalúa `ventas.id_venta`, que nunca es nulo en una venta real. Así, un `NULL` indica con certeza que no hubo coincidencia.
+- **Canal simulado:** el esquema no tiene una columna de canal. En la consulta 4 la etiqueta se crea como valor literal en cada `SELECT`, y el criterio de separación es el período (hasta el 10/03 y desde el 11/03).
+- **`UNION ALL` en lugar de `UNION`:** para que ninguna venta se elimine por coincidir con otra en todos sus valores.
+- **`INNER JOIN` y valores nulos:** `ventas.id_cliente` e `id_producto` admiten `NULL`. Una venta sin cliente o sin producto quedaría fuera de la consulta 1. Con los datos actuales no ocurre.
+
 ## Cómo ejecutar los ejercicios
 
 1. Descargar o clonar el repositorio.
@@ -82,8 +121,12 @@ La moneda no está especificada en la base de ejemplo. Los importes se presentan
 5. Ejecutar el script completo con **F5**, sin seleccionar un fragmento. Revisar la pestaña Mensajes y comprobar que los cuatro `SELECT` devuelvan **4, 5, 6 y 10 filas**, respectivamente.
 6. Abrir `m4_consultas_negocio.sql`. El archivo comienza con `USE ventas_tech_db;`; ajustar ese nombre si se utiliza una base distinta.
 7. Ejecutar el archivo completo con **F5** y revisar sus cuatro conjuntos de resultados. Las consultas de M4 no modifican los datos.
+8. Abrir `m5_consultas_joins.sql`. El archivo comienza con `USE ventas_tech_db;` y con el bloque de datos de prueba; ajustar el nombre de la base si se utiliza una distinta.
+9. Ejecutar el archivo completo con **F5** y revisar sus resultados: **10, 1, 1 y 2 filas**, respectivamente. A diferencia de M4, este archivo inserta dos registros de prueba (un cliente y un producto).
 
-Para ejecutar una consulta por separado, seleccionar todo su bloque. En la consulta 4, incluir desde `WITH` hasta el final del `SELECT` siguiente: la CTE y la consulta que la utiliza forman una sola instrucción.
+Para ejecutar una consulta por separado, seleccionar todo su bloque. En la consulta 4 de M4, incluir desde `WITH` hasta el final del `SELECT` siguiente: la CTE y la consulta que la utiliza forman una sola instrucción. En M5, la consulta 4 también debe seleccionarse completa, incluida la subconsulta con `UNION ALL` y el `GROUP BY` final.
+
+Si se vuelve a ejecutar `ventas_tech_db.sql`, los registros de prueba de M5 se eliminan junto con el resto de las tablas; se reinsertan al ejecutar de nuevo `m5_consultas_joins.sql`.
 
 ## Autor
 
