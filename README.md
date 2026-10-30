@@ -1,56 +1,179 @@
-# SQL Server — Ejercicios de Data Analytics
+# Análisis de ventas con SQL Server
 
-Repositorio de ejercicios del curso de SQL de Coderhouse, realizados como parte de mi formación en Data Analytics.
+Proyecto académico de Data Analytics desarrollado para Coderhouse. Utiliza una base de ventas de productos tecnológicos para practicar modelado relacional, consultas SQL e interpretación de resultados comerciales.
 
-El proyecto utiliza una base de datos de ejemplo de ventas de productos tecnológicos. La actividad de M3 implementa las tablas y carga los datos; la pre-entrega de M4 utiliza esa información para responder preguntas de negocio del equipo comercial de RetailPro.
+**Autor:** Iván Pugliese  
+**Base de datos:** `ventas_tech_db`  
+**Repositorio:** [coder-data-analyst-sql](https://github.com/ivanpugliese1/coder-data-analyst-sql)
 
+## Objetivo del proyecto
 
-## Contenido del repositorio
+Transformar los registros de ventas en información útil para responder preguntas comerciales:
 
-| Módulo | Archivo | Objetivo |
-|---|---|---|
-| M3 | [ventas_tech_db.sql](ventas_tech_db.sql) | Crear las tablas, cargar los datos y validar los registros. |
-| M4 | [m4_consultas_negocio.sql](m4_consultas_negocio.sql) | Obtener métricas mensuales, rankings de productos y clientes recurrentes. |
+- ¿Cuánto se factura por mes y cuál es el ticket promedio?
+- ¿Qué productos generan mayor facturación y cuántas unidades se venden?
+- ¿Qué clientes realizan más de un pedido?
+- ¿Cómo se relacionan las ventas con los clientes, los productos y las categorías?
+- ¿Qué conclusiones están respaldadas por los datos y qué decisiones necesitan información adicional?
 
-## M3 — Estructura y carga de datos
+El proyecto también incorpora una revisión crítica de propuestas generadas con inteligencia artificial, tanto sobre las consultas como sobre su interpretación.
 
-### Objetivo
+## Herramientas utilizadas
 
-Implementar las tablas de categorías, clientes, productos y ventas, con sus claves primarias, claves foráneas y restricciones. Cargar datos de ejemplo y comprobar el contenido de cada tabla.
+| Herramienta | Uso en el proyecto |
+| --- | --- |
+| Microsoft SQL Server | Motor de base de datos para almacenar las tablas y ejecutar las consultas. |
+| SQL Server Management Studio (SSMS) | Entorno para crear la base, abrir los scripts, ejecutarlos y revisar resultados. |
+| SQL / Transact-SQL (T-SQL) | Lenguaje utilizado para definir tablas, cargar datos, filtrar, agrupar y relacionar información. |
+| GitHub | Organización y publicación de los scripts y de la documentación. |
+| ChatGPT | Apoyo para revisar consultas y proponer interpretaciones, sujetas a evaluación crítica y verificación. |
 
-### Secciones del script
+## Modelo de datos y alcance
 
-1. **Eliminación de tablas:** elimina las tablas existentes, respetando sus dependencias.
-2. **Creación de tablas:** define columnas, tipos de datos y restricciones.
-3. **Inserción de datos:** carga los registros del ejercicio.
-4. **Validación:** muestra el contenido de las cuatro tablas mediante `SELECT *`.
+La base utilizada en estas entregas se organiza en cuatro tablas:
 
-### Datos esperados
+| Tabla | Contenido | Relación utilizada |
+| --- | --- | --- |
+| `clientes` | Identificador, nombre y ciudad de cada cliente. | `clientes.id_cliente` → `ventas.id_cliente`. |
+| `categorias` | Identificador, nombre y descripción de las categorías. | `categorias.id_categoria` → `productos.id_categoria`. |
+| `productos` | Identificador, nombre y categoría de cada producto. | `productos.id_producto` → `ventas.id_producto`. |
+| `ventas` | Cliente, producto, fecha, cantidad y precio unitario de la operación. | Tabla utilizada para calcular los indicadores comerciales. |
 
-| Tabla | Contenido | Registros |
-|---|---|---:|
-| categorias | Categorías de productos | 4 |
-| clientes | Datos de clientes | 5 |
-| productos | Productos, precios y stock | 6 |
-| ventas | Registros de ventas | 10 |
+Las relaciones permiten conectar un cliente con varias ventas, un producto con varias ventas y una categoría con varios productos.
 
-Los productos pueden estar asociados a una categoría. Las ventas pueden estar asociadas a un cliente y a un producto. Las claves foráneas verifican que los identificadores no nulos informados existan en sus tablas de referencia.
+**Unidad de análisis:** el archivo de M4 establece expresamente que, para esta entrega, cada fila de `ventas` se considera un pedido. Por eso, `COUNT(*)` representa la cantidad de pedidos y `AVG(cantidad * precio_unitario)` representa su ticket promedio.
 
-### Reejecución
+Si el modelo se amplía para registrar un pedido en varias filas —por ejemplo, una por producto—, estos indicadores deberán recalcularse a nivel de pedido.
 
-El script elimina las cuatro tablas y las recrea con los datos de ejemplo en cada ejecución. Esto permite repetir el ejercicio sin acumular registros, pero elimina cualquier dato adicional cargado en esas tablas.
+## Archivos y orden de ejecución
 
-## M4 — Consultas SQL de negocio
+| Orden | Archivo | Propósito |
+| --- | --- | --- |
+| 1 | `ventas_tech_db.sql` | Preparación inicial de la base: creación de tablas y carga de los datos de práctica de M3. |
+| 2 | `m4_consultas_negocio.sql` | Métricas mensuales, ranking de productos, clientes recurrentes y comparación con el promedio mensual. |
+| 3 | `m5_consultas_joins.sql` | Cruce de tablas con JOIN y combinación de resultados mediante UNION ALL. |
+| — | `README.md` | Descripción, instrucciones de ejecución y evaluación crítica del análisis. |
 
-### Objetivo
+M4 y M5 consultan la base preparada en M3. El orden anterior permite seguir las entregas de forma progresiva.
 
-Extraer métricas comerciales para RetailPro mediante consultas que utilizan únicamente la tabla `ventas`. En esta etapa se trabaja con IDs de productos y clientes, sin utilizar `JOIN`.
+## Cómo ejecutar los scripts SQL
 
-### Consultas incluidas
+### 1. Preparar el entorno
 
-| Consulta | Pregunta de negocio | Elementos utilizados |
-|---|---|---|
-| Resumen ejecutivo mensual | ¿Cuánto se facturó, cuántos pedidos hubo y cuál fue el ticket promedio de cada mes? | `MONTH`, `SUM`, `COUNT`, `AVG`, `CAST`, `GROUP BY`. |
+Se necesita una instancia de **SQL Server** disponible y **SSMS** instalado. SSMS es la aplicación cliente: también debe existir un motor de SQL Server al cual conectarse.
+
+La cuenta utilizada debe tener permisos para crear la base y sus tablas durante la preparación inicial, insertar los datos y ejecutar las consultas.
+
+### 2. Obtener los archivos
+
+Desde el repositorio, utilizar **Code → Download ZIP** y descomprimir los archivos.
+
+Si se utiliza Git, también se puede descargar el proyecto con:
+
+```bash
+git clone https://github.com/ivanpugliese1/coder-data-analyst-sql.git
+cd coder-data-analyst-sql
+```
+
+### 3. Conectarse desde SSMS
+
+1. Abrir SQL Server Management Studio.
+2. Conectarse al motor de base de datos usando el nombre de la instancia y el método de autenticación configurados en el equipo.
+3. Abrir `ventas_tech_db.sql` mediante **Archivo → Abrir → Archivo**, o con **Ctrl + O**.
+4. Ejecutar el script con **F5** o con el botón **Ejecutar**.
+5. Revisar la pestaña **Mensajes** y actualizar el Explorador de objetos para comprobar que la base y las tablas estén disponibles.
+
+Si no hay texto seleccionado, F5 ejecuta todo el contenido del editor. Si se selecciona una parte, ejecuta solamente esa selección.
+
+Para una base ya preparada, continuar con las consultas de M4 y M5. Antes de repetir el script inicial, revisar sus instrucciones de creación y carga para evitar recrear objetos o cargar datos nuevamente.
+
+### 4. Verificar la base y los datos
+
+En una nueva consulta, ejecutar:
+
+```sql
+USE ventas_tech_db;
+GO
+
+SELECT DB_NAME() AS base_actual;
+
+SELECT 'clientes' AS tabla, COUNT(*) AS cantidad_filas
+FROM clientes
+UNION ALL
+SELECT 'categorias', COUNT(*)
+FROM categorias
+UNION ALL
+SELECT 'productos', COUNT(*)
+FROM productos
+UNION ALL
+SELECT 'ventas', COUNT(*)
+FROM ventas;
+```
+
+En el conjunto de práctica analizado, `ventas` contiene **10 registros**.
+
+### 5. Ejecutar las consultas de M4 y M5
+
+1. Abrir `m4_consultas_negocio.sql`.
+2. Confirmar que la consulta utilice `ventas_tech_db`.
+3. Ejecutar el archivo completo o seleccionar una consulta y presionar **F5**.
+4. Revisar las tablas de resultados y la pestaña **Mensajes**.
+5. Repetir el procedimiento con `m5_consultas_joins.sql`.
+
+Para establecer la base activa en una ventana de consulta:
+
+```sql
+USE ventas_tech_db;
+GO
+```
+
+`GO` separa lotes de instrucciones en herramientas como SSMS; no forma parte del lenguaje T-SQL que ejecuta el motor.
+
+## Indicadores y consultas de negocio
+
+| Indicador o consulta | Cálculo o criterio | Interpretación |
+| --- | --- | --- |
+| Importe de un pedido | `cantidad * precio_unitario` | Valor del registro, usando el precio guardado en la venta. |
+| Facturación total | `SUM(cantidad * precio_unitario)` | Suma de los importes del grupo analizado. |
+| Cantidad de pedidos | `COUNT(*)` | Cantidad de filas, bajo el supuesto de un pedido por fila. |
+| Ticket promedio | `AVG(cantidad * precio_unitario)` | Importe promedio por pedido en este modelo. |
+| Unidades vendidas | `SUM(cantidad)` | Volumen vendido de cada producto. |
+| Ranking de productos | `TOP 5` ordenado por facturación descendente | Cinco productos con mayor facturación; los empates se ordenan por identificador. |
+| Clientes recurrentes | `GROUP BY id_cliente HAVING COUNT(*) > 1` | Clientes con más de un pedido en los datos disponibles. |
+| Comparación mensual | CTE con totales mensuales y `CASE` | Clasifica cada mes respecto del promedio de los totales mensuales. |
+
+El uso de `v.precio_unitario` conserva el precio registrado en la operación. Para reproducir el importe histórico de una venta, no corresponde sustituirlo por un precio actual del catálogo.
+
+## Resultados del conjunto de práctica
+
+El archivo de M4 identifica el período analizado como **marzo de 2024**. Los resultados compartidos muestran:
+
+| Indicador | Resultado |
+| --- | ---: |
+| Facturación total | 6.444,00 |
+| Cantidad de pedidos | 10 |
+| Ticket promedio | 644,40 |
+| Meses con ventas en el conjunto analizado | 1 |
+
+El ranking por facturación es el siguiente:
+
+| ID de producto | Unidades vendidas | Facturación | Participación en la facturación total |
+| --- | ---: | ---: | ---: |
+| 1 | 3 | 3.600,00 | 55,87 % |
+| 3 | 3 | 1.350,00 | 20,95 % |
+| 5 | 3 | 390,00 | 6,05 % |
+| 6 | 4 | 380,00 | 5,90 % |
+| 2 | 13 | 364,00 | 5,65 % |
+
+Los porcentajes se calculan sobre 6.444,00 y se redondean a dos decimales. Estos valores corresponden al conjunto de práctica revisado; si los datos cambian, los resultados también pueden cambiar.
+
+## Tres hallazgos comerciales revisados
+
+1. **Los productos 1 y 3 concentran el 76,82 % de la facturación.** Generan 4.950,00 en conjunto. Identifico una concentración relevante que merece seguimiento; para decidir acciones de disponibilidad o diversificación, revisaría el historial de ventas, los márgenes y las existencias.
+
+2. **El producto 2 lidera las unidades vendidas dentro del TOP 5, con un aporte de facturación del 5,65 %.** Sus 13 unidades generan 364,00. Su importe promedio por unidad es 28,00, frente a 1.200,00 del producto 1. Evaluaría su función comercial y su margen antes de proponer promociones o ventas complementarias. El ranking mostrado no permite afirmar que sea el más vendido en unidades de todo el catálogo.
+
+3. **El TOP 5 reúne el 94,41 % de la facturación total.** Los cinco productos suman 6.084,00 y los productos restantes aportan 360,00, equivalentes al 5,59 %. Agregaría una revisión de estos últimos para distinguir entre baja demanda, menor disponibilidad, incorporación reciente o menor precio. Los resultados actuales no permiten determinar cuál de esas explicaciones corresponde.cuál fue el ticket promedio de cada mes? | `MONTH`, `SUM`, `COUNT`, `AVG`, `CAST`, `GROUP BY`. |
 | Ranking de productos | ¿Qué cinco productos generaron más facturación y cuántas unidades se vendieron de cada uno? | `TOP 5`, `SUM`, `GROUP BY`, `ORDER BY`. |
 | Clientes recurrentes | ¿Qué clientes realizaron más de un pedido y cuánto gastaron? | `COUNT`, `SUM`, `GROUP BY`, `HAVING`. |
 | Comparación con el promedio mensual | ¿Qué meses quedaron por encima, por debajo o iguales al promedio de facturación mensual? | CTE con `WITH`, subconsultas, `AVG`, `CASE WHEN`. |
